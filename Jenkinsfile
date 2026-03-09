@@ -1,10 +1,21 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'JDK21'
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/farahelbaj/SEP2.git'
+            }
+        }
+
+        stage('Check Java Version') {
+            steps {
+                bat 'java -version'
+                bat 'mvn -version'
             }
         }
 
@@ -23,6 +34,12 @@ pipeline {
         stage('Run Containers') {
             steps {
                 bat 'docker compose up -d'
+            }
+        }
+
+        stage('Wait for Database') {
+            steps {
+                bat 'timeout /t 15'
             }
         }
 
