@@ -34,7 +34,7 @@ pipeline {
 
         stage('Check Database Table') {
             steps {
-                bat 'docker exec calc_mariadb mariadb -uroot -pTest12 -e "USE calc_data; SHOW TABLES;"'
+                bat 'docker exec calculator-db mariadb -uroot -pHera-95 -e "USE calc_data; SHOW TABLES;"'
             }
         }
     }
