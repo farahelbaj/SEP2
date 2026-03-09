@@ -10,7 +10,7 @@ public class ResultService {
 
     private static final String DB_NAME = "calc_data";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "Test12";
+    private static final String DB_PASSWORD = "Hera-95";
 
     static {
         try {
