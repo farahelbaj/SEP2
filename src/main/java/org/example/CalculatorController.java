@@ -1,3 +1,4 @@
+package org.example;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -17,11 +18,20 @@ public class CalculatorController {
 
             double sum = num1 + num2;
             double product = num1 * num2;
+            double difference = num1 - num2;
+            Double division = null;
+            String divisionText;
+            if (num2 !=  0){
+                division = num1 / num2;
+                divisionText = String.valueOf(division);
+            } else {
+                divisionText = "Can't divid by 0";
+            }
 
-            resultLabel.setText("Sum: " + sum + ", Product: " + product);
+            resultLabel.setText("Sum: " + sum + ", Product: " + product + " Difference: " + difference + " Division: " + divisionText);
 
             // Save to DB
-            ResultService.saveResult(num1, num2, sum, product);
+            ResultService.saveResult(num1, num2, sum, product, difference, division);
 
         } catch (NumberFormatException e) {
             resultLabel.setText("Please enter valid numbers!");

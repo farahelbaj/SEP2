@@ -1,0 +1,115 @@
+package org.example;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class ResultService {
+
+    private static final String DB_NAME = "calc_data";
+    private static final String DB_USER = "root";
+    private static final String DB_PASSWORD = "Test12";
+
+    static {
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String getDatabaseHost() {
+        String host = System.getenv("DB_HOST");
+        if (host == null || host.isEmpty()) {
+            host = "db";
+        }
+        return host;
+    }
+
+    private static String getDatabaseUrl() {
+        return "jdbc:mariadb://" + getDatabaseHost() + ":3306/" + DB_NAME
+                + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    }
+    public static void initializeDatabase() {
+        String dbUrl = getDatabaseUrl();
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, DB_USER, DB_PASSWORD);
+             Statement stmt = conn.createStatement()) {
+
+            String createTable = """
+            CREATE TABLE IF NOT EXISTS calc_results (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                number1 DOUBLE NOT NULL,
+                number2 DOUBLE NOT NULL,
+                sum_result DOUBLE NOT NULL,
+                difference_result DOUBLE NOT NULL,
+                product_result DOUBLE NOT NULL,
+                division_result DOUBLE NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """;
+
+            stmt.executeUpdate(createTable);
+            System.out.println("Database table calc_results is ready.");
+
+        } catch (SQLException e) {
+            System.err.println("Database initialization failed.");
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveResult(double n1, double n2, double sum, double difference, double product, Double division) {
+        String dbUrl = getDatabaseUrl();
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, DB_USER, DB_PASSWORD);
+             Statement stmt = conn.createStatement()) {
+
+            String createTable = """
+                CREATE TABLE IF NOT EXISTS calc_results (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    number1 DOUBLE NOT NULL,
+                    number2 DOUBLE NOT NULL,
+                    sum_result DOUBLE NOT NULL,
+                    difference_result DOUBLE NOT NULL,
+                    product_result DOUBLE NOT NULL,
+                    division_result DOUBLE NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """;
+            stmt.executeUpdate(createTable);
+
+            String insert = """
+                INSERT INTO calc_results
+                (number1, number2, sum_result, difference_result, product_result, division_result)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
+
+            try (PreparedStatement ps = conn.prepareStatement(insert)) {
+                ps.setDouble(1, n1);
+                ps.setDouble(2, n2);
+                ps.setDouble(3, sum);
+                ps.setDouble(4, difference);
+                ps.setDouble(5, product);
+
+                if (division != null) {
+                    ps.setDouble(6, division);
+                } else {
+                    ps.setNull(6, java.sql.Types.DOUBLE);
+                }
+
+                ps.executeUpdate();
+            }
+
+            System.out.println("Result saved successfully.");
+
+        } catch (SQLException e) {
+            System.err.println("Failed to save result to DB: " + dbUrl);
+            e.printStackTrace();
+        }
+    }
+
+
+
+}
