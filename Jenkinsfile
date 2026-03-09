@@ -39,7 +39,7 @@ pipeline {
 
         stage('Wait for Database') {
             steps {
-                bat 'timeout /t 15'
+                bat 'powershell -Command "Start-Sleep -Seconds 15"'
             }
         }
 
