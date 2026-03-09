@@ -34,29 +34,46 @@ public class ResultService {
     }
     public static void initializeDatabase() {
         String dbUrl = getDatabaseUrl();
+        int maxAttempts = 10;
+        int delayMillis = 5000;
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, DB_USER, DB_PASSWORD);
-             Statement stmt = conn.createStatement()) {
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try (Connection conn = DriverManager.getConnection(dbUrl, DB_USER, DB_PASSWORD);
+                 Statement stmt = conn.createStatement()) {
 
-            String createTable = """
-            CREATE TABLE IF NOT EXISTS calc_results (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                number1 DOUBLE NOT NULL,
-                number2 DOUBLE NOT NULL,
-                sum_result DOUBLE NOT NULL,
-                difference_result DOUBLE NOT NULL,
-                product_result DOUBLE NOT NULL,
-                division_result DOUBLE NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-            """;
+                String createTable = """
+                CREATE TABLE IF NOT EXISTS calc_results (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    number1 DOUBLE NOT NULL,
+                    number2 DOUBLE NOT NULL,
+                    sum_result DOUBLE NOT NULL,
+                    difference_result DOUBLE NOT NULL,
+                    product_result DOUBLE NOT NULL,
+                    division_result DOUBLE NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """;
 
-            stmt.executeUpdate(createTable);
-            System.out.println("Database table calc_results is ready.");
+                stmt.executeUpdate(createTable);
+                System.out.println("Database table calc_results is ready.");
+                return;
 
-        } catch (SQLException e) {
-            System.err.println("Database initialization failed.");
-            e.printStackTrace();
+            } catch (SQLException e) {
+                System.err.println("Database not ready yet. Attempt " + attempt + " of " + maxAttempts);
+
+                if (attempt == maxAttempts) {
+                    System.err.println("Database initialization failed.");
+                    e.printStackTrace();
+                    return;
+                }
+
+                try {
+                    Thread.sleep(delayMillis);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
         }
     }
 

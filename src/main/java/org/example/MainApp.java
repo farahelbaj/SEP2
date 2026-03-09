@@ -9,7 +9,6 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        ResultService.initializeDatabase();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/calculator.fxml"));
         Scene scene = new Scene(loader.load());
         stage.setTitle("Sum & Product Calculator");

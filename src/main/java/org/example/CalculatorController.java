@@ -31,7 +31,7 @@ public class CalculatorController {
             resultLabel.setText("Sum: " + sum + ", Product: " + product + " Difference: " + difference + " Division: " + divisionText);
 
             // Save to DB
-            ResultService.saveResult(num1, num2, sum, product, difference, division);
+            ResultService.saveResult(num1, num2, sum, difference, product, division);
 
         } catch (NumberFormatException e) {
             resultLabel.setText("Please enter valid numbers!");
